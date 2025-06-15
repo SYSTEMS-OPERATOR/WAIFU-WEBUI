@@ -25,14 +25,29 @@ def upscale_image(image: Image.Image) -> Image.Image:
 
 
 with gr.Blocks() as demo:
-    # Create a simple interface with one image input and output.
-    gr.Markdown("## Low Res Waifu Image Upscaler ✨")
-    input_image = gr.Image(label="Input Image")
-    output_image = gr.Image(label="Upscaled Image")
-    upscale_button = gr.Button("Upscale")
+    # Create a simple navigational menu using tabs.
+    with gr.Tabs() as tabs:
+        with gr.TabItem("Home"):
+            gr.Markdown(
+                "# WAIFU-WEBUI\nChoose an option from the navigation tabs above."
+            )
 
-    # Connect the button click event to the upscale function.
-    upscale_button.click(fn=upscale_image, inputs=input_image, outputs=output_image)
+        with gr.TabItem("Upscale"):
+            gr.Markdown("## Low Res Waifu Image Upscaler ✨")
+            input_image = gr.Image(label="Input Image")
+            output_image = gr.Image(label="Upscaled Image")
+            upscale_button = gr.Button("Upscale")
+
+            # Connect the button click event to the upscale function.
+            upscale_button.click(
+                fn=upscale_image, inputs=input_image, outputs=output_image
+            )
+
+        with gr.TabItem("About"):
+            gr.Markdown(
+                "This demo uses a placeholder upscaling function. "
+                "It simply doubles the image size to illustrate the UI."
+            )
 
 
 if __name__ == "__main__":
