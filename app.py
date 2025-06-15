@@ -29,14 +29,14 @@ with gr.Blocks() as demo:
     with gr.Tabs() as tabs:
         with gr.TabItem("Home"):
             gr.Markdown(
-                "# WAIFU-WEBUI\nChoose an option from the navigation tabs above."
+                "# WAIFU-WEBUI 💖\nChoose an option from the navigation tabs above."
             )
 
         with gr.TabItem("Upscale"):
             gr.Markdown("## Low Res Waifu Image Upscaler ✨")
             input_image = gr.Image(label="Input Image")
             output_image = gr.Image(label="Upscaled Image")
-            upscale_button = gr.Button("Upscale")
+            upscale_button = gr.Button("Upscale 🖼️")
 
             # Connect the button click event to the upscale function.
             upscale_button.click(
@@ -46,7 +46,7 @@ with gr.Blocks() as demo:
         with gr.TabItem("About"):
             gr.Markdown(
                 "This demo uses a placeholder upscaling function. "
-                "It simply doubles the image size to illustrate the UI."
+                "It simply doubles the image size to illustrate the UI. 🎨"
             )
 
 
