@@ -11,18 +11,22 @@ import gradio as gr
 
 
 def upscale_image(image: Image.Image) -> Image.Image:
-    """Return the uploaded image unchanged.
+    """Upscale the provided image by a factor of two.
 
-    This function acts as a placeholder for the actual model inference
-    that will upscale the provided low resolution waifu image.
+    This function performs a basic resize operation as a stand in for a real
+    machine learning model that would enhance the low resolution waifu image.
     """
-    # TODO: Replace this stub with real upscaling logic.
-    return image
+    if image is None:
+        return None
+
+    width, height = image.size
+    upscale_size = (width * 2, height * 2)
+    return image.resize(upscale_size, Image.LANCZOS)
 
 
 with gr.Blocks() as demo:
     # Create a simple interface with one image input and output.
-    gr.Markdown("## Low Res Waifu Image Upscaler")
+    gr.Markdown("## Low Res Waifu Image Upscaler ✨")
     input_image = gr.Image(label="Input Image")
     output_image = gr.Image(label="Upscaled Image")
     upscale_button = gr.Button("Upscale")
