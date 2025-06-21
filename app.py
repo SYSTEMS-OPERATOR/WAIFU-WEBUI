@@ -1,7 +1,10 @@
-"""Gradio web UI for Low Res Waifu Models.
+"""Gradio web UI for Low Res Waifu Models. 💖
 
 This script launches a simple Gradio interface that accepts an image and
 returns the same image as a placeholder for a real upscaling model.
+
+Example:
+    Run ``python app.py`` to start the demo. 🚀
 """
 
 from __future__ import annotations
