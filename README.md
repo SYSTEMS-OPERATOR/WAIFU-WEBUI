@@ -1,6 +1,6 @@
 # WAIFU-WEBUI 🌸✨
 
-A Gradio web UI for managing a waifu companion AI. 🖼️
+A Gradio web UI for creating a simple waifu companion. 🖼️
 
 The interface provides tools to build a custom persona from manga panels,
 edit character attributes and chat with the generated companion. Manga
@@ -11,11 +11,8 @@ used for simple dialogue generation.
 ## Installation 🔧
 
 1. Clone this repository.
-2. Install the dependencies with `pip install -r requirements.txt` 🍰
-
-## Manual Install 🛠️
-
-Install the dependencies with:
+2. Install the dependencies with `pip install -r requirements.txt`.
+3. Install Tesseract OCR so manga pages can be processed:
 
 ```bash
 pip install pillow gradio pytesseract  # 🔧
@@ -23,17 +20,15 @@ pip install pillow gradio pytesseract  # 🔧
 
 ## Usage 🚀
 
-Run `python app.py` 💻 to start the interface. The application launches a local
-Gradio server presenting several tabs:
+Run `python app.py` to launch the interface at `http://localhost:7860`.
+The UI exposes several tabs:
 
-* **Setup** – configure character attributes and upload an avatar.
-* **Manga OCR** – import manga pages and extract dialogue using OCR.
-* **Chat** – interact with your waifu using the collected lines.
-* **Upscale** – demo image upscaling.
-* **About** – project information.
+- **Persona** – edit the waifu's attributes.
+- **Chat** – talk with the persona. Replies come from the dataset or the catchphrase.
+- **Dataset** – collect text from manga pages or manual input and save it.
+- **Upscale** – simple image upscaling (placeholder functionality).
+- **About** – details about this demo.
 
-The included OCR and chat logic are simple examples that demonstrate the
-workflow for building a personalized companion dataset.
 
 ## License 📜
 

@@ -1,36 +1,130 @@
-"""Gradio interface for creating a waifu companion AI. 💖
+"""Gradio web UI for creating a simple waifu companion. 💖
+
+The interface provides several tabs that allow you to tweak a persona,
+chat with it, build a text dataset from manga pages and upscale images.
+
+Example:
+    Run ``python app.py`` to start the demo. 🚀
 
 This application demonstrates a minimal workflow for building a persona from
 manga panels. Users can configure character attributes, extract dialogue text
 via OCR and chat with the resulting companion. The upscaling tab from the
 original project is retained as a simple example.
+
 """
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 import random
-from dataclasses import dataclass, field
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
-import gradio as gr
 from PIL import Image
+import gradio as gr
 import pytesseract
+
+# ------------------------------
+# Data storage
+# ------------------------------
 
 
 @dataclass
-class WaifuCharacter:
-    """Data container describing the waifu persona."""
+class Persona:
+    """Simple data structure holding persona attributes."""
 
-    name: str = "My Waifu"
-    description: str = ""
-    avatar: Optional[Image.Image] = None
-    dataset: List[str] = field(default_factory=list)
+    name: str = "Waifu"
+    age: str = "unknown"
+    personality: str = "cheerful"
+    catchphrase: str = "Hello!"
 
-    def add_dialogue(self, text: str) -> None:
-        """Split text into lines and extend the dataset."""
 
-        lines = [line.strip() for line in text.splitlines() if line.strip()]
-        self.dataset.extend(lines)
+# Instantiate the editable persona
+persona = Persona()
+
+# Collected dataset lines from text or manga pages
+dataset: List[str] = []
+
+
+def save_dataset() -> str:
+    """Save the collected dataset to ``dataset.txt``."""
+
+    with open("dataset.txt", "w", encoding="utf-8") as file:
+        for line in dataset:
+            file.write(f"{line}\n")
+    return "dataset.txt saved"
+
+
+def load_dataset(file_path: str) -> str:
+    """Load lines from a text file into the dataset."""
+
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            lines = [line.strip() for line in file if line.strip()]
+            dataset.extend(lines)
+    except OSError:
+        return "Failed to load file"
+    return "\n".join(dataset)
+
+
+def update_persona(
+    name: str,
+    age: str,
+    personality: str,
+    catchphrase: str,
+) -> str:
+    """Update the global persona with the provided values."""
+
+    if name:
+        persona.name = name
+    if age:
+        persona.age = age
+    if personality:
+        persona.personality = personality
+    if catchphrase:
+        persona.catchphrase = catchphrase
+    return "Persona updated"
+
+
+def add_text_to_dataset(text: str) -> str:
+    """Append provided text to the dataset and return all lines."""
+
+    if text:
+        dataset.append(text)
+    return "\n".join(dataset)
+
+
+def add_image_to_dataset(image: Image.Image) -> str:
+    """Extract text from an image using OCR and add it to the dataset."""
+
+    if image is not None:
+        ocr_text = pytesseract.image_to_string(image)
+        lines = [
+            line.strip()
+            for line in ocr_text.splitlines()
+            if line.strip()
+        ]
+        dataset.extend(lines)
+    return "\n".join(dataset)
+
+
+def generate_reply(_history: List[Tuple[str, str]], message: str) -> str:
+    """Generate a simple reply using the dataset or the persona catchphrase."""
+
+    if dataset:
+        return random.choice(dataset)
+    return persona.catchphrase
+
+
+def chat(
+    history: List[Tuple[str, str]],
+    message: str,
+) -> List[Tuple[str, str]]:
+    """Append the user's message and generated reply to the history."""
+
+    reply = generate_reply(history, message)
+    history = history + [(message, reply)]
+    return history
+
 
 
 # Global character instance used across interface callbacks
@@ -38,8 +132,11 @@ WAIFU = WaifuCharacter()
 
 
 def upscale_image(image: Image.Image) -> Optional[Image.Image]:
-    """Upscale the provided image by a factor of two."""
+    """Upscale the provided image by a factor of two.
 
+    This function performs a basic resize operation as a stand in for a real
+    machine learning model that would enhance a low resolution waifu image.
+    """
     if image is None:
         return None
 
@@ -48,91 +145,90 @@ def upscale_image(image: Image.Image) -> Optional[Image.Image]:
     return image.resize(upscale_size, Image.LANCZOS)
 
 
-def extract_text(image: Image.Image) -> str:
-    """Perform OCR on the provided image using Tesseract."""
-
-    if image is None:
-        return ""
-    return pytesseract.image_to_string(image)
-
-
-def update_character(name: str, description: str, avatar: Image.Image) -> str:
-    """Update the global character attributes."""
-
-    if name:
-        WAIFU.name = name
-    WAIFU.description = description
-    WAIFU.avatar = avatar
-    return f"Character '{WAIFU.name}' updated."
-
-
-def process_manga_page(image: Image.Image) -> Tuple[str, str]:
-    """Extract text from a manga page and store it in the dataset."""
-
-    text = extract_text(image)
-    WAIFU.add_dialogue(text)
-    size_info = f"Dataset contains {len(WAIFU.dataset)} lines."
-    return text, size_info
-
-
-def generate_reply(user_message: str) -> str:
-    """Return a simple response based on collected dialogue lines."""
-
-    if not WAIFU.dataset:
-        return "Dataset empty. Please add manga pages first."
-    return random.choice(WAIFU.dataset)
-
-
-def chat(user_message: str, history: List[Tuple[str, str]]) -> Tuple[List[Tuple[str, str]], str]:
-    """Append user/AI messages to the chat history."""
-
-    reply = generate_reply(user_message)
-    history = history + [(user_message, reply)]
-    return history, ""
-
-
-with gr.Blocks(title="WAIFU-WEBUI") as demo:
+with gr.Blocks() as demo:
+    """Build the multi-tabbed web interface."""
     with gr.Tabs() as tabs:
-        # Setup tab
-        with gr.TabItem("Setup"):
-            char_name = gr.Textbox(label="Name", value=WAIFU.name)
-            char_desc = gr.Textbox(label="Description")
-            char_avatar = gr.Image(label="Avatar", type="pil")
-            status = gr.Textbox(label="Status", interactive=False)
-            save_btn = gr.Button("Save")
-
-            save_btn.click(
-                update_character,
-                inputs=[char_name, char_desc, char_avatar],
-                outputs=status,
+        # ------------------------------
+        # Home tab
+        # ------------------------------
+        with gr.TabItem("Home"):
+            gr.Markdown(
+                "# WAIFU-WEBUI 💖\n"
+                "Choose an option from the navigation tabs above."
             )
 
-        # Manga OCR tab
-        with gr.TabItem("Manga OCR"):
-            ocr_input = gr.Image(label="Manga Page", type="pil")
-            ocr_text = gr.Textbox(label="Extracted Text")
-            dataset_info = gr.Textbox(label="Dataset Info", interactive=False)
-            ocr_btn = gr.Button("Add to Dataset")
+        # ------------------------------
+        # Persona editing tab
+        # ------------------------------
+        with gr.TabItem("Persona"):
+            gr.Markdown("## Edit Persona Attributes")
+            with gr.Row():
+                name = gr.Textbox(label="Name", value=persona.name)
+                age = gr.Textbox(label="Age", value=persona.age)
+            personality = gr.Textbox(
+                label="Personality", value=persona.personality
+            )
+            catchphrase = gr.Textbox(
+                label="Catchphrase", value=persona.catchphrase
+            )
+            update_btn = gr.Button("Update Persona")
+            persona_status = gr.Textbox(label="Status", interactive=False)
 
-            ocr_btn.click(
-                process_manga_page,
-                inputs=ocr_input,
-                outputs=[ocr_text, dataset_info],
+            update_btn.click(
+                update_persona,
+                inputs=[name, age, personality, catchphrase],
+                outputs=persona_status,
             )
 
+        # ------------------------------
         # Chat tab
+        # ------------------------------
         with gr.TabItem("Chat"):
+            gr.Markdown("## Talk with your waifu")
             chatbot = gr.Chatbot()
-            user_input = gr.Textbox(label="Your Message")
+            msg = gr.Textbox(label="Your message")
             send_btn = gr.Button("Send")
 
-            send_btn.click(
-                chat,
-                inputs=[user_input, chatbot],
-                outputs=[chatbot, user_input],
-            )
+            send_btn.click(chat, inputs=[chatbot, msg], outputs=chatbot)
+            msg.submit(chat, inputs=[chatbot, msg], outputs=chatbot)
 
-        # Upscale tab retained from original demo
+        # ------------------------------
+        # Dataset management tab
+        # ------------------------------
+        with gr.TabItem("Dataset"):
+            gr.Markdown("## Build Dataset from Manga Pages")
+            dataset_box = gr.Textbox(
+                label="Current Dataset", value="", lines=10, interactive=False
+            )
+            text_input = gr.Textbox(label="Add Text")
+            add_text_btn = gr.Button("Add Text")
+            manga_image = gr.Image(label="Add Manga Page")
+            add_image_btn = gr.Button("Add Image")
+            load_file = gr.File(label="Load Dataset", type="filepath")
+            load_btn = gr.Button("Load")
+            save_btn = gr.Button("Save")
+
+            add_text_btn.click(
+                add_text_to_dataset,
+                inputs=text_input,
+                outputs=dataset_box,
+            )
+            add_image_btn.click(
+                add_image_to_dataset,
+                inputs=manga_image,
+                outputs=dataset_box,
+            )
+            load_btn.click(
+                load_dataset,
+                inputs=load_file,
+                outputs=dataset_box,
+            )
+            save_btn.click(save_dataset, outputs=dataset_box)
+
+        # ------------------------------
+        # Upscale tab
+        # ------------------------------
+
         with gr.TabItem("Upscale"):
             gr.Markdown("## Low Res Waifu Image Upscaler ✨")
             input_image = gr.Image(label="Input Image", type="pil")
@@ -143,7 +239,11 @@ with gr.Blocks(title="WAIFU-WEBUI") as demo:
                 fn=upscale_image, inputs=input_image, outputs=output_image
             )
 
+
+        # ------------------------------
         # About tab
+        # ------------------------------
+
         with gr.TabItem("About"):
             gr.Markdown(
                 "This demo allows basic creation of a companion persona "
