@@ -1,6 +1,11 @@
 # WAIFU-WEBUI 🌸✨
 
-A Gradio web UI for Low Res Waifu Models. 🖼️
+A Gradio web UI for managing a waifu companion AI. 🖼️
+
+The interface provides tools to build a custom persona from manga panels,
+edit character attributes and chat with the generated companion. Manga
+images can be uploaded for text extraction via OCR, which populates a dataset
+used for simple dialogue generation.
 
 
 ## Installation 🔧
@@ -13,31 +18,22 @@ A Gradio web UI for Low Res Waifu Models. 🖼️
 Install the dependencies with:
 
 ```bash
-pip install pillow gradio  # 🔧
+pip install pillow gradio pytesseract  # 🔧
 ```
 
 ## Usage 🚀
 
-Run `python app.py` 💻 to start the demo interface. The script will launch a
-local Gradio server with a simple navigation menu. Choose the **Upscale** tab
-to upload an image and view the **simple** ✨ upscaled result. 🎉
+Run `python app.py` 💻 to start the interface. The application launches a local
+Gradio server presenting several tabs:
 
-The interface presents three tabs—*Home*, *Upscale*, and *About*—allowing quick
-navigation. The **Upscale** button doubles the size of your image using a
-placeholder algorithm.
+* **Setup** – configure character attributes and upload an avatar.
+* **Manga OCR** – import manga pages and extract dialogue using OCR.
+* **Chat** – interact with your waifu using the collected lines.
+* **Upscale** – demo image upscaling.
+* **About** – project information.
 
-## License 📝
-
-This project is released under the [Unlicense](LICENSE). Feel free to use it
-for any purpose!
-
-## Usage 🚀
-
-Run `python app.py` 💻 to start the demo interface. The script will launch a local Gradio server with a simple navigation menu. Choose the **Upscale** tab to upload an image and view the **simple** 🚀 upscaled result.
-
-## Example 🔍
-
-Once running, open `http://localhost:7860` in your browser. Upload a low-resolution image on the **Upscale** tab and click **Upscale** to see the doubled resolution preview.
+The included OCR and chat logic are simple examples that demonstrate the
+workflow for building a personalized companion dataset.
 
 ## License 📜
 
