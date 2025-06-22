@@ -5,6 +5,12 @@ chat with it, build a text dataset from manga pages and upscale images.
 
 Example:
     Run ``python app.py`` to start the demo. 🚀
+
+This application demonstrates a minimal workflow for building a persona from
+manga panels. Users can configure character attributes, extract dialogue text
+via OCR and chat with the resulting companion. The upscaling tab from the
+original project is retained as a simple example.
+
 """
 
 from __future__ import annotations
@@ -120,7 +126,12 @@ def chat(
     return history
 
 
-def upscale_image(image: Image.Image) -> Image.Image:
+
+# Global character instance used across interface callbacks
+WAIFU = WaifuCharacter()
+
+
+def upscale_image(image: Image.Image) -> Optional[Image.Image]:
     """Upscale the provided image by a factor of two.
 
     This function performs a basic resize operation as a stand in for a real
@@ -217,9 +228,10 @@ with gr.Blocks() as demo:
         # ------------------------------
         # Upscale tab
         # ------------------------------
+
         with gr.TabItem("Upscale"):
             gr.Markdown("## Low Res Waifu Image Upscaler ✨")
-            input_image = gr.Image(label="Input Image")
+            input_image = gr.Image(label="Input Image", type="pil")
             output_image = gr.Image(label="Upscaled Image")
             upscale_button = gr.Button("Upscale 🖼️")
 
@@ -227,16 +239,19 @@ with gr.Blocks() as demo:
                 fn=upscale_image, inputs=input_image, outputs=output_image
             )
 
+
         # ------------------------------
         # About tab
         # ------------------------------
+
         with gr.TabItem("About"):
             gr.Markdown(
-                "This demo uses a placeholder upscaling function. "
-                "It simply doubles the image size to illustrate the UI. 🎨"
+                "This demo allows basic creation of a companion persona "
+                "from manga pages. OCR and chat responses are simplistic "
+                "placeholders for research purposes."
             )
 
 
 if __name__ == "__main__":
-    # Launch the Gradio demo interface when executed as a script.
     demo.launch()
+
