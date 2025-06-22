@@ -17,7 +17,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import random
-from typing import List, Tuple
+import os
+from typing import List, Tuple, Optional
 
 from PIL import Image
 import gradio as gr
@@ -43,6 +44,11 @@ persona = Persona()
 
 # Collected dataset lines from text or manga pages
 dataset: List[str] = []
+
+# Load existing dataset if present
+if os.path.exists("dataset.txt"):
+    with open("dataset.txt", "r", encoding="utf-8") as file:
+        dataset.extend([line.strip() for line in file if line.strip()])
 
 
 def save_dataset() -> str:
@@ -85,6 +91,14 @@ def update_persona(
     return "Persona updated"
 
 
+def reset_persona() -> str:
+    """Reset persona attributes to their default values."""
+
+    global persona
+    persona = Persona()
+    return "Persona reset"
+
+
 def add_text_to_dataset(text: str) -> str:
     """Append provided text to the dataset and return all lines."""
 
@@ -107,6 +121,17 @@ def add_image_to_dataset(image: Image.Image) -> str:
     return "\n".join(dataset)
 
 
+def clear_dataset() -> str:
+    """Remove all dataset entries and delete ``dataset.txt`` if it exists."""
+
+    dataset.clear()
+    try:
+        os.remove("dataset.txt")
+    except OSError:
+        pass
+    return ""
+
+
 def generate_reply(_history: List[Tuple[str, str]], message: str) -> str:
     """Generate a simple reply using the dataset or the persona catchphrase."""
 
@@ -127,8 +152,7 @@ def chat(
 
 
 
-# Global character instance used across interface callbacks
-WAIFU = WaifuCharacter()
+
 
 
 def upscale_image(image: Image.Image) -> Optional[Image.Image]:
@@ -172,11 +196,16 @@ with gr.Blocks() as demo:
                 label="Catchphrase", value=persona.catchphrase
             )
             update_btn = gr.Button("Update Persona")
+            reset_btn = gr.Button("Reset Persona")
             persona_status = gr.Textbox(label="Status", interactive=False)
 
             update_btn.click(
                 update_persona,
                 inputs=[name, age, personality, catchphrase],
+                outputs=persona_status,
+            )
+            reset_btn.click(
+                reset_persona,
                 outputs=persona_status,
             )
 
@@ -198,7 +227,10 @@ with gr.Blocks() as demo:
         with gr.TabItem("Dataset"):
             gr.Markdown("## Build Dataset from Manga Pages")
             dataset_box = gr.Textbox(
-                label="Current Dataset", value="", lines=10, interactive=False
+                label="Current Dataset",
+                value="\n".join(dataset),
+                lines=10,
+                interactive=False,
             )
             text_input = gr.Textbox(label="Add Text")
             add_text_btn = gr.Button("Add Text")
@@ -207,6 +239,7 @@ with gr.Blocks() as demo:
             load_file = gr.File(label="Load Dataset", type="filepath")
             load_btn = gr.Button("Load")
             save_btn = gr.Button("Save")
+            clear_btn = gr.Button("Clear")
 
             add_text_btn.click(
                 add_text_to_dataset,
@@ -224,6 +257,7 @@ with gr.Blocks() as demo:
                 outputs=dataset_box,
             )
             save_btn.click(save_dataset, outputs=dataset_box)
+            clear_btn.click(clear_dataset, outputs=dataset_box)
 
         # ------------------------------
         # Upscale tab
