@@ -60,14 +60,17 @@ def save_dataset() -> str:
     return "dataset.txt saved"
 
 
-def load_dataset(file_path: str) -> str:
+def load_dataset(file_path: Optional[str]) -> str:
     """Load lines from a text file into the dataset."""
+
+    if not file_path or not os.path.isfile(file_path):
+        return "Failed to load file"
 
     try:
         with open(file_path, "r", encoding="utf-8") as file:
             lines = [line.strip() for line in file if line.strip()]
             dataset.extend(lines)
-    except OSError:
+    except (OSError, TypeError):
         return "Failed to load file"
     return "\n".join(dataset)
 
