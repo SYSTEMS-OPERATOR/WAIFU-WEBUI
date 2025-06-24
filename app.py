@@ -57,7 +57,11 @@ def save_dataset() -> str:
     with open("dataset.txt", "w", encoding="utf-8") as file:
         for line in dataset:
             file.write(f"{line}\n")
-    return "dataset.txt saved"
+    # Return the current dataset so the UI textbox is not replaced by a
+    # status message. Previously this function returned the string
+    # "dataset.txt saved", which caused the dataset view to be overwritten
+    # with that message when pressing the "Save" button.
+    return "\n".join(dataset)
 
 
 def load_dataset(file_path: Optional[str]) -> str:
