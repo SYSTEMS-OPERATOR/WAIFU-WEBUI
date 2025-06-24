@@ -234,7 +234,8 @@ with gr.Blocks() as demo:
             )
             text_input = gr.Textbox(label="Add Text")
             add_text_btn = gr.Button("Add Text")
-            manga_image = gr.Image(label="Add Manga Page")
+            # Use PIL format so pytesseract can process the image correctly
+            manga_image = gr.Image(label="Add Manga Page", type="pil")
             add_image_btn = gr.Button("Add Image")
             load_file = gr.File(label="Load Dataset", type="filepath")
             load_btn = gr.Button("Load")
