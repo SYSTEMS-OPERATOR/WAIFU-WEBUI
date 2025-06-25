@@ -29,6 +29,14 @@ The UI exposes several tabs:
 - **Upscale** – simple image upscaling (placeholder functionality).
 - **About** – details about this demo.
 
+## Testing 🧪
+
+Run the unit tests with [pytest](https://pytest.org/):
+
+```bash
+PYTHONPATH=. pytest -v
+```
+
 
 ## License 📜
 
