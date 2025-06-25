@@ -29,6 +29,50 @@ The UI exposes several tabs:
 - **Upscale** – simple image upscaling (placeholder functionality).
 - **About** – details about this demo.
 
+## Game Flow 🕹️
+
+The diagram below summarizes how the main parts of the application
+interact. Each object corresponds to a section of the code in
+`app.py` that provides a specific function.
+
+```mermaid
+graph TD
+    user([User]) --> ui["Gradio Interface"]
+
+    subgraph Persona
+        updatePersona["update_persona()"]
+        resetPersona["reset_persona()"]
+    end
+
+    subgraph Dataset
+        addText["add_text_to_dataset()"]
+        addImage["add_image_to_dataset()"]
+        saveData["save_dataset()"]
+        loadData["load_dataset()"]
+        clearData["clear_dataset()"]
+    end
+
+    subgraph Chat
+        chatFn["chat()"]
+        genReply["generate_reply()"]
+    end
+
+    subgraph Upscale
+        upscaleImage["upscale_image()"]
+    end
+
+    ui --> Persona
+    ui --> Dataset
+    ui --> Chat
+    ui --> Upscale
+
+    Chat --> genReply
+    genReply --> Persona
+    genReply --> Dataset
+    Dataset --> addImage
+    addImage --> ocr["pytesseract OCR"]
+```
+
 ## Testing 🧪
 
 Run the unit tests with [pytest](https://pytest.org/):
