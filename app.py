@@ -45,6 +45,7 @@ persona = Persona()
 # Collected dataset lines from text or manga pages
 dataset: List[str] = []
 
+
 # Load existing dataset if present
 if os.path.exists("dataset.txt"):
     with open("dataset.txt", "r", encoding="utf-8") as file:
@@ -132,7 +133,6 @@ def add_image_to_dataset(image: Image.Image) -> str:
 
 def clear_dataset() -> str:
     """Remove all dataset entries and delete ``dataset.txt`` if it exists."""
-
     dataset.clear()
     try:
         os.remove("dataset.txt")
@@ -162,10 +162,6 @@ def chat(
     reply = generate_reply(history, message)
     history = history + [(message, reply)]
     return history, ""
-
-
-
-
 
 
 def upscale_image(image: Image.Image) -> Optional[Image.Image]:
@@ -276,7 +272,6 @@ with gr.Blocks() as demo:
         # ------------------------------
         # Upscale tab
         # ------------------------------
-
         with gr.TabItem("Upscale"):
             gr.Markdown("## Low Res Waifu Image Upscaler ✨")
             input_image = gr.Image(label="Input Image", type="pil")
@@ -287,11 +282,9 @@ with gr.Blocks() as demo:
                 fn=upscale_image, inputs=input_image, outputs=output_image
             )
 
-
         # ------------------------------
         # About tab
         # ------------------------------
-
         with gr.TabItem("About"):
             gr.Markdown(
                 "This demo allows basic creation of a companion persona "

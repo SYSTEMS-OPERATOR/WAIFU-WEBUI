@@ -15,7 +15,7 @@ used for simple dialogue generation.
 3. Install Tesseract OCR so manga pages can be processed:
 
 ```bash
-pip install pillow gradio pytesseract  # 🔧
+pip install pillow gradio pytesseract 
 ```
 
 ## Usage 🚀
@@ -80,7 +80,6 @@ Run the unit tests with [pytest](https://pytest.org/):
 ```bash
 PYTHONPATH=. pytest -v
 ```
-
 
 ## License 📜
 
