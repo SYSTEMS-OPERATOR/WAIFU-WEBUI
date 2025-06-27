@@ -54,6 +54,13 @@ def test_add_image_to_dataset(monkeypatch):
     assert "line1" in app.dataset and "line2" in app.dataset
 
 
+def test_add_text_multiline():
+    text = "line1\nline2\n"
+    result = app.add_text_to_dataset(text)
+    assert result.splitlines() == ["line1", "line2"]
+    assert app.dataset == ["line1", "line2"]
+
+
 def test_generate_reply_and_chat(monkeypatch):
     app.dataset.clear()
     # if dataset empty -> catchphrase
