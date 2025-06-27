@@ -65,7 +65,8 @@ def test_generate_reply_and_chat(monkeypatch):
     assert reply2 in app.dataset
 
     history = []
-    history = app.chat(history, "hi")
+    history, cleared = app.chat(history, "hi")
+    assert cleared == ""
     assert len(history) == 1
     assert history[0][0] == "hi"
     assert history[0][1] in app.dataset

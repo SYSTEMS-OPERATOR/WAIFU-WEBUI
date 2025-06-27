@@ -150,12 +150,16 @@ def generate_reply(_history: List[Tuple[str, str]], message: str) -> str:
 def chat(
     history: List[Tuple[str, str]],
     message: str,
-) -> List[Tuple[str, str]]:
-    """Append the user's message and generated reply to the history."""
+) -> Tuple[List[Tuple[str, str]], str]:
+    """Append the user's message and generated reply to the history.
+
+    Returns the updated history and an empty string so the UI can clear the
+    text input box after each message is sent.
+    """
 
     reply = generate_reply(history, message)
     history = history + [(message, reply)]
-    return history
+    return history, ""
 
 
 
@@ -225,8 +229,8 @@ with gr.Blocks() as demo:
             msg = gr.Textbox(label="Your message")
             send_btn = gr.Button("Send")
 
-            send_btn.click(chat, inputs=[chatbot, msg], outputs=chatbot)
-            msg.submit(chat, inputs=[chatbot, msg], outputs=chatbot)
+            send_btn.click(chat, inputs=[chatbot, msg], outputs=[chatbot, msg])
+            msg.submit(chat, inputs=[chatbot, msg], outputs=[chatbot, msg])
 
         # ------------------------------
         # Dataset management tab
