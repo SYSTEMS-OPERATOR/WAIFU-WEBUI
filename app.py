@@ -110,7 +110,9 @@ def add_text_to_dataset(text: str) -> str:
     """Append provided text to the dataset and return all lines."""
 
     if text:
-        dataset.append(text)
+        lines = [line.strip() for line in text.splitlines() if line.strip()]
+        if lines:
+            dataset.extend(lines)
     return "\n".join(dataset)
 
 
